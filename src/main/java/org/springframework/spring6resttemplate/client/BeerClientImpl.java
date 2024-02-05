@@ -1,5 +1,6 @@
 package org.springframework.spring6resttemplate.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,13 @@ public class BeerClientImpl implements BeerClient {
         ResponseEntity<String> stringResponseEntity = restTemplate.getForEntity(BASE_URL + GET_BEER_PATH, String.class);
 
         ResponseEntity<Map> mapResponseEntity = restTemplate.getForEntity(BASE_URL + GET_BEER_PATH, Map.class);
+
+//        cach su dung jsonNode https://www.baeldung.com/java-jsonnode-get-keys
+        ResponseEntity<JsonNode> jsonNodeResponseEntity = restTemplate.getForEntity(BASE_URL + GET_BEER_PATH, JsonNode.class);
+
+        jsonNodeResponseEntity.getBody().findPath("content").elements().forEachRemaining(node -> {
+            System.out.println(node.get("beerName").asText());
+        });
 
         System.out.println(stringResponseEntity.getBody());
 
