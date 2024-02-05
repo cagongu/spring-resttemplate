@@ -18,10 +18,9 @@ public class BeerClientImpl implements BeerClient {
     public Page<BeerDTO> listBeers() {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
-        ResponseEntity<String> stringResponse =
-                restTemplate.getForEntity("http://localhost:8080/api/v1/beer", String.class);
+        ResponseEntity<String> stringResponseEntity =  restTemplate.getForEntity("http://localhost:8080/api/v1/beer", String.class);
 
-        System.out.println(stringResponse.getBody());
+        System.out.println(stringResponseEntity.getBody());
 
         return null;
     }
