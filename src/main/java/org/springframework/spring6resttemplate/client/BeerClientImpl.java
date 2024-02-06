@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
 import org.springframework.spring6resttemplate.model.BeerDTO;
 import org.springframework.spring6resttemplate.model.BeerDTOPageImpl;
 import org.springframework.spring6resttemplate.model.BeerStyle;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -27,14 +27,10 @@ public class BeerClientImpl implements BeerClient {
     public BeerDTO createBeer(BeerDTO newDto) {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
-        ResponseEntity<BeerDTO> response = restTemplate.postForEntity(GET_BEER_PATH, newDto, BeerDTO.class);
-
-        if (response.getStatusCode() == HttpStatus.CREATED) {
-            return response.getBody();
-        } else {
-            throw new RuntimeException("Error occurred while creating beer: " + response.getStatusCodeValue());
-        }
+        URI uri = restTemplate.postForLocation(GET_BEER_PATH, newDto);
+        return restTemplate.getForObject(uri.getPath(), BeerDTO.class);
     }
+
 
     @Override
     public BeerDTO getBeerById(UUID beerId) {
