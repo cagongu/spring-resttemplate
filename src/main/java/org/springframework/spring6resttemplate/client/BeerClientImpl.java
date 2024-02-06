@@ -19,17 +19,38 @@ public class BeerClientImpl implements BeerClient {
     private static final String GET_BEER_PATH = "/api/v1/beer";
 
     @Override
-    public Page<BeerDTO> listBeers(String beerName) {
+    public Page<BeerDTO> lisBeers() {
+        return this.listBeers(null, null, null, null, null);
+    }
+
+    @Override
+    public Page<BeerDTO> listBeers(String beerName, String beerStyle, Boolean showInventory, Integer pageNumber, Integer pageSize) {
         RestTemplate restTemplate = restTemplateBuilder.build();
 
         UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromPath(GET_BEER_PATH);
 
-        if (beerName != null){
+        if (beerName != null) {
             uriComponentsBuilder.queryParam("beerName", beerName);
         }
 
+        if (beerStyle != null) {
+            uriComponentsBuilder.queryParam("beerStyle", beerStyle);
+        }
+
+        if (pageNumber != null) {
+            uriComponentsBuilder.queryParam("pageNumber", pageNumber);
+        }
+
+        if (pageSize != null) {
+            uriComponentsBuilder.queryParam("pageSize", pageSize);
+        }
+
+        if (showInventory != null) {
+            uriComponentsBuilder.queryParam("showInventory", showInventory);
+        }
+
         ResponseEntity<BeerDTOPageImpl> response =
-                restTemplate.getForEntity(uriComponentsBuilder.toUriString() , BeerDTOPageImpl.class);
+                restTemplate.getForEntity(uriComponentsBuilder.toUriString(), BeerDTOPageImpl.class);
 
         return response.getBody();
     }
