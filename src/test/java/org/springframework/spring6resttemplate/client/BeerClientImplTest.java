@@ -6,11 +6,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.spring6resttemplate.model.BeerDTO;
 import org.springframework.spring6resttemplate.model.BeerStyle;
+import org.springframework.web.client.HttpClientErrorException;
 
 import java.math.BigDecimal;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 
 @SpringBootTest
@@ -75,5 +75,26 @@ class BeerClientImplTest {
         BeerDTO updatedBeer = beerClient.updateBeer(beerDto);
 
         assertEquals(newName, updatedBeer.getBeerName());
+    }
+
+    @Test
+    void deleteBeer() {
+        BeerDTO newDto = BeerDTO.builder()
+                .price(new BigDecimal("10.99"))
+                .beerName("Mango Bobs 2")
+                .beerStyle(BeerStyle.IPA)
+                .quantityOnHand(500)
+                .upc("123245")
+                .build();
+
+        BeerDTO beerDto = beerClient.createBeer(newDto);
+
+        beerClient.deleteBeer(beerDto.getId());
+
+        assertThrows(HttpClientErrorException.class, () -> {
+            //should error
+            beerClient.getBeerById(beerDto.getId());
+        });
+
     }
 }
