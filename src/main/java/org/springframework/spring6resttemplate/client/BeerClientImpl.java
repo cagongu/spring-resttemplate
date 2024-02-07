@@ -88,7 +88,7 @@ public class BeerClientImpl implements BeerClient {
 
 
         ResponseEntity<BeerDTOPageImpl> response =
-                restTemplate.getForEntity(uriComponentsBuilder.toUriString() , BeerDTOPageImpl.class);
+                restTemplate.getForEntity(uriComponentsBuilder.toUriString(), BeerDTOPageImpl.class);
 
 
         return response.getBody();
