@@ -66,6 +66,17 @@ public class BeerClientMockTest {
     }
 
     @Test
+    void testDeleteBeer() {
+        server.expect(method(HttpMethod.DELETE)).andExpect(requestToUriTemplate(URL + BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
+                .andRespond(withNoContent());
+
+        beerClient.deleteBeer(dto.getId());
+
+//        kiem tra tat ca yeu cau deu thuc hien dung.
+        server.verify();
+    }
+
+    @Test
     void testUpdateBeer() {
         server.expect(method(HttpMethod.PUT)).andExpect(requestToUriTemplate(URL + BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
                 .andRespond(withNoContent());
@@ -75,7 +86,7 @@ public class BeerClientMockTest {
         BeerDTO beerDTO = beerClient.updateBeer(dto);
         assertThat(beerDTO.getId()).isEqualTo(dto.getId());
     }
-
+    
     @Test
     void testCreateBeer() {
         URI uri = UriComponentsBuilder.fromPath(BeerClientImpl.GET_BEER_BY_ID_PATH)
