@@ -19,14 +19,17 @@ import org.springframework.spring6resttemplate.model.BeerDTOPageImpl;
 import org.springframework.spring6resttemplate.model.BeerStyle;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
+import java.net.URI;
 import java.util.Arrays;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withAccepted;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 
 
@@ -46,7 +49,7 @@ public class BeerClientMockTest {
     @Autowired
     ObjectMapper objectMapper;
 
-//    https://www.baeldung.com/spring-mock-rest-template
+    //    https://www.baeldung.com/spring-mock-rest-template
     @Mock
     RestTemplateBuilder mockRestTemplateBuilder = new RestTemplateBuilder(new MockServerRestTemplateCustomizer());
 
@@ -56,6 +59,28 @@ public class BeerClientMockTest {
         server = MockRestServiceServer.bindTo(restTemplate).build();
         when(mockRestTemplateBuilder.build()).thenReturn(restTemplate);
         beerClient = new BeerClientImpl(mockRestTemplateBuilder);
+    }
+
+    @Test
+    void testCreateBeer() throws JsonProcessingException {
+        BeerDTO dto = getBeerDto();
+
+        String response = objectMapper.writeValueAsString(dto);
+
+        URI uri = UriComponentsBuilder.fromPath(BeerClientImpl.GET_BEER_BY_ID_PATH)
+                .build(dto.getId());
+
+        server.expect(method(HttpMethod.POST))
+                .andExpect(requestTo(URL + BeerClientImpl.GET_BEER_PATH))
+                .andRespond(withAccepted().location(uri));
+
+        server.expect(method(HttpMethod.GET))
+                .andExpect(requestToUriTemplate(URL + BeerClientImpl.GET_BEER_BY_ID_PATH, dto.getId()))
+                .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
+
+        BeerDTO responseDto = beerClient.createBeer(dto);
+
+        assertThat(responseDto.getId()).isEqualTo(dto.getId());
     }
 
     @Test
@@ -86,7 +111,7 @@ public class BeerClientMockTest {
         assertThat(dtos.getContent().size()).isGreaterThan(0);
     }
 
-    BeerDTO getBeerDto(){
+    BeerDTO getBeerDto() {
         return BeerDTO.builder()
                 .id(UUID.randomUUID())
                 .price(new BigDecimal("10.99"))
@@ -97,7 +122,7 @@ public class BeerClientMockTest {
                 .build();
     }
 
-    BeerDTOPageImpl getPage(){
+    BeerDTOPageImpl getPage() {
         return new BeerDTOPageImpl(Arrays.asList(getBeerDto()), 1, 25, 1);
     }
 }
