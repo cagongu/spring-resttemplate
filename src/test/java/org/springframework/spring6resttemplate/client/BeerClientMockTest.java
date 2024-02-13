@@ -77,6 +77,7 @@ public class BeerClientMockTest {
 
         server.expect(method(HttpMethod.GET))
                 .andExpect(requestTo(uri))
+                .andExpect(header("Authorization", "Basic dXNlcjE6cGFzc3dvcmQ="))
                 .andExpect(queryParam("beerName", "ALE"))
                 .andRespond(withSuccess(response, MediaType.APPLICATION_JSON));
 
@@ -93,7 +94,7 @@ public class BeerClientMockTest {
                 .andRespond(withResourceNotFound());
 
         assertThrows(HttpClientErrorException.class, () -> {
-             beerClient.deleteBeer(dto.getId());
+            beerClient.deleteBeer(dto.getId());
         });
 
         server.verify();
@@ -120,7 +121,7 @@ public class BeerClientMockTest {
         BeerDTO beerDTO = beerClient.updateBeer(dto);
         assertThat(beerDTO.getId()).isEqualTo(dto.getId());
     }
-    
+
     @Test
     void testCreateBeer() {
         URI uri = UriComponentsBuilder.fromPath(BeerClientImpl.GET_BEER_BY_ID_PATH)
